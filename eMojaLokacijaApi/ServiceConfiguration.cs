@@ -26,6 +26,13 @@ namespace eMojaLokacijaApi
 				3765);
 			services.AddSingleton(NetTopologySuite.NtsGeometryServices.Instance);
 
+			// Add GeoJSON serialization for Geometry objects
+			services.AddControllers()
+				.AddJsonOptions(options =>
+				{
+					options.JsonSerializerOptions.Converters.Add(new NetTopologySuite.IO.Converters.GeoJsonConverterFactory());
+				});
+
 			services.AddDbContext<MojaLokacijaContext>(options =>
 			{
 				options.UseSqlServer(configuration.GetConnectionString("Default"), x => x.UseNetTopologySuite());
