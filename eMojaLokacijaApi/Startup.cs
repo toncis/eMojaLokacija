@@ -1,4 +1,6 @@
-﻿namespace eMojaLokacijaApi
+﻿using eMojaLokacijaApi.Extensions.Hub;
+
+namespace eMojaLokacijaApi
 {
 	public class Startup
 	{
@@ -56,6 +58,7 @@
 			{
 				app.UseSwagger();
 				app.UseSwaggerUI();
+				app.UseDeveloperExceptionPage();
 			}
 
 			app.UseHttpsRedirection();
@@ -74,6 +77,7 @@
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
+				endpoints.MapHub<MessageHub>("/locationsearch");
 				//endpoints.MapHealthChecks("/health");
 			});
 
