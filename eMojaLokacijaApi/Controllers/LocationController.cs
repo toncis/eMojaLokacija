@@ -29,14 +29,14 @@ namespace eMojaLokacijaApi.Controllers
             _logger = logger ?? throw new ArgumentException(nameof(logger));
         }
 
-        [HttpPost("GetAreaFunLocations", Name = "GetAreaFunLocations", Order = 1)]
+        [HttpPost("SearchAreaFunLocations", Name = "SearchAreaFunLocations", Order = 1)]
         // [Authorize(Policy = "LocatonApiUser")]
         [ProducesResponseType(typeof(AreaFunLocationVmResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(void), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ResponseBaseVm), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ResponseBaseVm), StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AreaFunLocationVmResponse>> GetAreaFunLocations([FromBody] AreaFunLocationVmRequest searchRequest)
+        public async Task<ActionResult<AreaFunLocationVmResponse>> SearchAreaFunLocations([FromBody] AreaFunLocationVmRequest searchRequest)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
