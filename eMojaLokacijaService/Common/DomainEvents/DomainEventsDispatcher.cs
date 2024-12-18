@@ -23,12 +23,9 @@ namespace eMojaLokacijaService.Common.Domain
 					domainEvent.DispatchingContext = dispatchingContext;
 					await _mediator.Publish(domainEvent);
 				}
-			});
+			}) ?? Enumerable.Empty<Task>();
 
-			if (tasks != null)
-			{
-				await Task.WhenAll(tasks);
-			}
+			await Task.WhenAll(tasks);
 		}
 
 		async Task IDomainEventsDispatcher.DispatchEventAsync(IEvent domainEvent, DispatchingContext dispatchingContext)

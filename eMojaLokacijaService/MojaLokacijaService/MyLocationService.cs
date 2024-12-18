@@ -11,86 +11,87 @@ using System.Threading.Tasks;
 
 namespace eMojaLokacijaService.MojaLokacijaService
 {
-    public class MyLocationService : IMyLocationService
-    {
-        private readonly double _boundaryDistance = 25;
+	public class MyLocationService : IMyLocationService
+	{
+		private readonly double _boundaryDistance = 25;
 
-        private readonly MojaLokacijaContext.MojaLokacijaContext _locationContext;
-        private readonly ILogger<MyLocationService> _logger;
+		private readonly MojaLokacijaContext.MojaLokacijaContext _locationContext;
+		private readonly ILogger<MyLocationService> _logger;
 
-        public MyLocationService(
-            MojaLokacijaContext.MojaLokacijaContext locationContext,
-            ILogger<MyLocationService> logger)
-        {
-            _locationContext = locationContext ?? throw new ArgumentException(nameof(locationContext));
-            _logger = logger ?? throw new ArgumentException(nameof(logger));
-        }
+		public MyLocationService(
+			MojaLokacijaContext.MojaLokacijaContext locationContext,
+			ILogger<MyLocationService> logger)
+		{
+			_locationContext = locationContext ?? throw new ArgumentException(nameof(locationContext));
+			_logger = logger ?? throw new ArgumentException(nameof(logger));
+		}
 
-        #region IMojaLokacijaService
+		#region IMojaLokacijaService
 
-        public async Task<FunLocationsResponse> GetFunLocations(FunLocationsRequest request)
-        {
-            FunLocationsResponse retValue = new FunLocationsResponse();
+		public async Task<FunLocationsResponse> GetFunLocations(FunLocationsRequest request)
+		{
+			FunLocationsResponse retValue = new FunLocationsResponse();
 
-            retValue.FunLocations = await GetActiveFunLocations(request.MyGeoPoint);
+			retValue.FunLocations = await GetActiveFunLocations(request.MyGeoPoint);
 
-            await SaveFunLocationSearch(request.UserId, request.MyGeoPoint, retValue.FunLocations);
+			await SaveFunLocationSearch(request.UserId, request.MyGeoPoint, retValue.FunLocations);
 
-            return retValue;
-        }
+			return retValue;
+		}
 
-        #endregion
+		#endregion
 
-        #region Private Methods
+		#region Private Methods
 
-        private async Task<IEnumerable<FunLocationDto>> GetActiveFunLocations(Geometry searchGeoPoint)
-        {
-            // Replace this with a call to optimised view
+		private async Task<IEnumerable<FunLocationDto>> GetActiveFunLocations(Geometry searchGeoPoint)
+		{
+			// Replace this with a call to optimised view
 
-            var funLocations = _locationContext.FunLocation
-                .Where(x => x.Active && x.GeoPoint.Distance(searchGeoPoint) <= _boundaryDistance)
-                .Include(x => x.Type)
-                .Select(x => new FunLocationDto
-                {
-                    Id = x.Id,
-                    Description = x.Description,
-                    GeoPoint = x.GeoPoint,
-                    LocationType = x.Type.Description
-                });
+			IEnumerable<FunLocationDto> funLocations = await _locationContext.FunLocation
+				.Where(x => x.Active && x.GeoPoint.Distance(searchGeoPoint) <= _boundaryDistance)
+				.Include(x => x.Type)
+				.Select(x => new FunLocationDto
+				{
+					Id = x.Id,
+					Description = x.Description,
+					GeoPoint = x.GeoPoint,
+					LocationType = x.Type.Description
+				})
+				.ToListAsync();
 
-            return funLocations;
-        }
+			return funLocations;
+		}
 
-        private async Task SaveFunLocationSearch(int userId, Geometry myGeoPoint, IEnumerable<FunLocationDto> funLocations)
-        {
-            var dateTimeNow = DateTime.Now;
+		private async Task SaveFunLocationSearch(int userId, Geometry myGeoPoint, IEnumerable<FunLocationDto> funLocations)
+		{
+			var dateTimeNow = DateTime.Now;
 
-            var newMyLocation = new MyLocation
-            {
-                UserId = userId,
-                Active = true,
-                DateCreated = dateTimeNow,
-                Description = "Fun Location Search",
-                GeoPoint = myGeoPoint,
-                MyFunLocation = new List<MyFunLocation>()
-            };
+			var newMyLocation = new MyLocation
+			{
+				UserId = userId,
+				Active = true,
+				DateCreated = dateTimeNow,
+				Description = "Fun Location Search",
+				GeoPoint = myGeoPoint,
+				MyFunLocation = new List<MyFunLocation>()
+			};
 
-            foreach (var funLocation in funLocations)
-            {
-                newMyLocation.MyFunLocation.Add(new MyFunLocation
-                {
-                    Active = true,
-                    DateCreated = dateTimeNow,
-                    MyLocationId = newMyLocation.Id,
-                    FunLocationId = funLocation.Id,
-                });
-            }
+			foreach (var funLocation in funLocations)
+			{
+				newMyLocation.MyFunLocation.Add(new MyFunLocation
+				{
+					Active = true,
+					DateCreated = dateTimeNow,
+					MyLocationId = newMyLocation.Id,
+					FunLocationId = funLocation.Id,
+				});
+			}
 
-            await _locationContext.AddAsync(newMyLocation);
-            await _locationContext.SaveChangesAsync();
-        }
+			await _locationContext.AddAsync(newMyLocation);
+			await _locationContext.SaveChangesAsync();
+		}
 
-        #endregion
+		#endregion
 
-    }
+	}
 }
