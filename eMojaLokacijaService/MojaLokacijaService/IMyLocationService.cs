@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace eMojaLokacijaService.MojaLokacijaService
 {
-	internal interface IMojaLokacijaService
-	{
-		Task<FunLocationsResponse> GetFunLocations(FunLocationsRequest request);
-	}
+    public interface IMyLocationService
+    {
+        Task<FunLocationsResponse> GetFunLocations(FunLocationsRequest request);
+    }
 }

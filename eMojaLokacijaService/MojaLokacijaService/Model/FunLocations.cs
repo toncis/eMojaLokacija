@@ -7,16 +7,14 @@ using System.Threading.Tasks;
 
 namespace eMojaLokacijaService.MojaLokacijaService.Model
 {
-	public class FunLocationsRequest
-	{
-		int UserId { get; set; }
+    public class FunLocationsRequest
+    {
+        public int UserId { get; set; }
+        public Geometry MyGeoPoint { get; set; }
+    }
 
-	}
-
-	public class FunLocationsResponse
-	{
-		IEnumerable<FunLocationDto> funLocationDtos { get; set; } = new List<FunLocationDto>();
-
-
-	}
+    public class FunLocationsResponse
+    {
+        public IEnumerable<FunLocationDto> FunLocations { get; set; } = new List<FunLocationDto>();
+    }
 }
